@@ -28,5 +28,23 @@ def say_hello():
     })
 
 
+# New Endpoint 1: Course Information
+@app.route('/course')
+def get_course():
+    name = request.args.get('name', 'IT3120')
+    return jsonify({
+        "course": name,
+        "description": "Deploying a Flask API Online"
+    })
+
+
+# New Endpoint 2: Personalized Greeting
+@app.route('/greet/<name>')
+def greet_person(name):
+    return jsonify({
+        "message": f"Welcome, {name}!"
+    })
+
+
 if __name__ == '__main__':
     app.run(debug=True)
