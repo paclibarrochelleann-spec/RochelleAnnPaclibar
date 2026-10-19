@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student API Interface</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 750px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        h1 {
+            text-align: center;
+            color: #174a7e;
+        }
+
+        h2 {
+            color: #174a7e;
+            margin-top: 0;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 22px;
+            margin-bottom: 22px;
+            border-radius: 12px;
+            border: 1px solid #dbe3ec;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        button {
+            padding: 11px 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            background-color: #174a7e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #0f3459;
+        }
+
+        input {
+            width: 100%;
+            max-width: 350px;
+            padding: 11px;
+            margin-top: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .result {
+            margin-top: 18px;
+            padding: 14px;
+            background-color: #f8fafc;
+            border: 1px solid #dbe3ec;
+            border-radius: 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .result:empty {
+            display: none;
+        }
+
+        .result p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Student API Interface</h1>
+    <p class="subtitle">
+        Welcome! Explore student information and test the Flask APIs.
+    </p>
+
+    <!-- Student Information -->
+    <section class="card">
+        <h2>Student Information</h2>
+        <p>Click the button to retrieve student information from the API.</p>
+
+        <button onclick="loadStudent()">
+            Load Student Information
+        </button>
+
+        <div id="result" class="result" aria-live="polite"></div>
+    </section>
+
+    <!-- Greeting API -->
+    <section class="card">
+        <h2>Greeting API</h2>
+        <p>Enter your first name to receive a greeting.</p>
+
+        <input
+            type="text"
+            id="nameInput"
+            placeholder="Enter your first name"
+        >
+
+        <br>
+
+        <button onclick="sayHello()">Say Hello</button>
+
+        <div id="greeting" class="result" aria-live="polite"></div>
+    </section>
+
+    <!-- Custom Course API -->
+    <section class="card">
+        <h2>Course Information</h2>
+        <p>Click the button to retrieve course information from the custom API.</p>
+
+        <button onclick="loadCourse()">
+            Load Course Information
+        </button>
+
+        <div id="courseResult" class="result" aria-live="polite"></div>
+    </section>
+
+    <footer>
+        Student API Interface | Powered by Flask
+    </footer>
+
+    <script>
+        // Student Information API
+        function loadStudent() {
+            const result = document.getElementById('result');
+            result.textContent = 'Loading student information...';
+
+            fetch('/student')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Request failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    result.innerHTML =
+                        '<p><b>Student ID:</b> ' + data.student_id + '</p>' +
+                        '<p><b>Name:</b> ' + data.name + '</p>' +
+                        '<p><b>Program:</b> ' + data.program + '</p>' +
+                        '<p><b>Year:</b> ' + data.year + '</p>' +
+                        '<p><b>Section:</b> ' + data.section + '</p>';
+                })
+                .catch(error => {
+                    result.textContent =
+                        'Unable to retrieve student information.';
+                });
+        }
+
+        // Greeting API
+        function sayHello() {
+            const name = document.getElementById('nameInput').value.trim();
+            const greeting = document.getElementById('greeting');
+
+            if (!name) {
+                greeting.textContent = 'Please enter your first name.';
+                return;
+            }
+
+            greeting.textContent = 'Loading greeting...';
+
+            fetch('/hello?name=' + encodeURIComponent(name))
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Request failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    greeting.textContent = data.message;
+                })
+                .catch(error => {
+                    greeting.textContent =
+                        'Unable to retrieve greeting.';
+                });
+        }
+
+        // Custom Course API
+        function loadCourse() {
+            const result = document.getElementById('courseResult');
+            result.textContent = 'Loading course information...';
+
+            fetch('/course')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Request failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    result.innerHTML =
+                        '<p><b>Course Code:</b> ' + data.course_code + '</p>' +
+                        '<p><b>Course Name:</b> ' + data.course_name + '</p>' +
+                        '<p><b>Program:</b> ' + data.program + '</p>' +
+                        '<p><b>Year:</b> ' + data.year + '</p>';
+                })
+                .catch(error => {
+                    result.textContent =
+                        'Unable to retrieve course information.';
+                });
+        }
+    </script>
+
+</body>
+</html>

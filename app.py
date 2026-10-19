@@ -1,12 +1,11 @@
-
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def home():
-    return "Welcome to my first API!"
+    return render_template('index.html')
 
 
 @app.route('/student')
@@ -28,21 +27,14 @@ def say_hello():
     })
 
 
-# New Endpoint 1: Course Information
+# Custom API endpoint for Laboratory Activity 6
 @app.route('/course')
 def get_course():
-    name = request.args.get('name', 'IT3120')
     return jsonify({
-        "course": name,
-        "description": "Deploying a Flask API Online"
-    })
-
-
-# New Endpoint 2: Personalized Greeting
-@app.route('/greet/<name>')
-def greet_person(name):
-    return jsonify({
-        "message": f"Welcome, {name}!"
+        "course_code": "IT 3120",
+        "course_name": "System Integration",
+        "program": "BSIT",
+        "year": 3
     })
 
 
