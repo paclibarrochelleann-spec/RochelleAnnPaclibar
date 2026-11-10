@@ -87,6 +87,19 @@
             line-height: 1.5;
         }
 
+        .student {
+            margin: 10px 0;
+            padding: 12px 14px;
+            background-color: white;
+            border: 1px solid #dbe3ec;
+            border-left: 4px solid #174a7e;
+            border-radius: 7px;
+        }
+
+        .student p {
+            margin: 4px 0;
+        }
+
         footer {
             text-align: center;
             color: #64748b;
@@ -143,6 +156,40 @@
         </button>
 
         <div id="courseResult" class="result" aria-live="polite"></div>
+    </section>
+
+    <!-- Students from the SQLite database (Laboratory Activity 7) -->
+    <section class="card">
+        <h2>Students from Database</h2>
+        <p>Click the button to load the student records stored in the SQLite database.</p>
+
+        <button onclick="loadStudents()">
+            Load Students
+        </button>
+
+        <div id="studentList" class="result" aria-live="polite"></div>
+    </section>
+
+    <!-- Additional database endpoint (Laboratory Activity 7) -->
+    <section class="card">
+        <h2>Students by Section</h2>
+        <p>
+            Uses the extra endpoint <b>/students/section/&lt;section&gt;</b>.
+            Enter a section such as Dijkstra or Kruskal.
+        </p>
+
+        <input
+            type="text"
+            id="sectionInput"
+            value="Dijkstra"
+            placeholder="Enter a section"
+        >
+
+        <br>
+
+        <button onclick="loadSection()">Search Section</button>
+
+        <div id="sectionList" class="result" aria-live="polite"></div>
     </section>
 
     <footer>
@@ -226,6 +273,84 @@
                 .catch(error => {
                     result.textContent =
                         'Unable to retrieve course information.';
+                });
+        }
+
+        // Student text is shown as plain text, never run as HTML.
+        function esc(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        // Show a list of students inside a box.
+        function showStudents(box, data, emptyText) {
+            if (data.length === 0) {
+                box.textContent = emptyText;
+                return;
+            }
+
+            let output = '';
+
+            data.forEach(student => {
+                output +=
+                    '<div class="student">' +
+                    '<p><b>' + esc(student.student_id) + '</b> - ' +
+                    esc(student.name) + '</p>' +
+                    '<p>' + esc(student.program) +
+                    ' | Year ' + esc(student.year) +
+                    ' | Section ' + esc(student.section) + '</p>' +
+                    '</div>';
+            });
+
+            box.innerHTML = output;
+        }
+
+        // Students from Database (Laboratory Activity 7)
+        function loadStudents() {
+            const box = document.getElementById('studentList');
+            box.textContent = 'Loading students...';
+
+            fetch('/students')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Request failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showStudents(box, data, 'No student records found.');
+                })
+                .catch(error => {
+                    box.textContent = 'Unable to retrieve student records.';
+                });
+        }
+
+        // Additional database endpoint: students in one section
+        function loadSection() {
+            const section = document.getElementById('sectionInput').value.trim();
+            const box = document.getElementById('sectionList');
+
+            if (!section) {
+                box.textContent = 'Please enter a section.';
+                return;
+            }
+
+            box.textContent = 'Loading students...';
+
+            fetch('/students/section/' + encodeURIComponent(section))
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Request failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showStudents(box, data, 'No students found in section ' + section + '.');
+                })
+                .catch(error => {
+                    box.textContent = 'Unable to retrieve student records.';
                 });
         }
     </script>
